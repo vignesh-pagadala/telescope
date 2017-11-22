@@ -10,7 +10,7 @@ int main()
 	// Read file into buffer.
 	FILE *fp;
 
-	fp = fopen("C:/Users/Vignesh/source/repos/Project2/Debug/XML_Test_File.xml", "r");
+	fp = fopen("XML_Test_File.xml", "r");
 	if (fp == NULL)
 	{
 		printf("Failed to open file\n");
