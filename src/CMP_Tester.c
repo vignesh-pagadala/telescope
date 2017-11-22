@@ -15,16 +15,18 @@ int main()
 	{
 		printf("Failed to open file\n");
 	}
+	else
+	{
+		// Load file contents to the buffer.
+		fread(buff, sizeof(char), 100000, fp);
 
-	// Load file contents to the buffer.
-	fread(buff, sizeof(char), 100000, fp);
+		// Close file
+		fclose(fp);
 
-	// Close file
-	fclose(fp);
-
-	// Call process()
-	int p = process(buff);
-	printf("\n%d", p);
+		// Call process()
+		int p = process(buff);
+		printf("\n%d", p);
+	}
 	getch();
 
 	return 0;
