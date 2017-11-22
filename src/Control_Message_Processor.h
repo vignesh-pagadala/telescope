@@ -181,6 +181,9 @@ int process(char buff[100000])
 	}
 	else
 	{
+		free(sha1);
+		free(ubl);
+		free(fq);
 		return -1;
 	}
 }
