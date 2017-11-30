@@ -1,15 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<CRL_MESSAGE length = "0001000">
-<ControlMessageLength>0001000</ControlMessageLength>
-<ControlMessageID>CM0001</ControlMessageID>
-<RootBrokerID>192.168.100.1:5000</RootBrokerID>
-<LeafBrokerID>192.168.102.1:8000</LeafBrokerID>
+<CRL_MESSAGE length = "0000700">
+<ControlMessageLength>0000700</ControlMessageLength>
+<ControlMessageID>CM0893</ControlMessageID>
+<RootBrokerID>192.168.100.1:50550</RootBrokerID>
+<ChildBrokerID>192.168.103.1:66750</ChildBrokerID>
 <UBL>
-<Broker1 IP = "129.82.43.139" Port = "8030" NameID = "eta" Priority = "50"></Broker1>
-<Broker2 IP = "129.82.47.233" Port = "3030" NameID = "phi" Priority = "10"></Broker2>
-<Broker3 IP = "129.82.43.247" Port = "4000" NameID = "rho" Priority = "5"></Broker3>
-<Broker4 IP = "129.82.42.231" Port = "8888" NameID = "delta" Priority = "0"></Broker4>
+<Broker1 IP = "129.82.47.128" Port = "8090" NameID = "eta" Priority = "60"></Broker1>
+<Broker2 IP = "129.82.47.264" Port = "8070" NameID = "phi" Priority = "10"></Broker2>
+<Broker3 IP = "129.82.47.232" Port = "5020" NameID = "rho" Priority = "5"></Broker3>
+<Broker4 IP = "129.82.47.280" Port = "8338" NameID = "delta" Priority = "0"></Broker4>
 </UBL>
 <FilteringQuery>Industry = IND45</FilteringQuery>
-<SHA>e858af98fb1ea40ddb18819b9e6bf5304bb7e307</SHA>
+<SHA1>e3f7c8de36bd352dce47a43d0a334df877ce2631</SHA1>
 </CRL_MESSAGE>
