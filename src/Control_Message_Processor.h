@@ -1,10 +1,11 @@
+
 /* Parses an XML file using the expat parser, and filters out UBL and FQ. Validates using SHA-1 hash */
 
 #include<stdio.h>
 #include<string.h>
 #include<expat.h>
 #include<stdlib.h>
-
+#include<openssl\sha.h>
 // Globals. 
 //For storing a copy of the elements contents.
 static char *cont;
@@ -16,7 +17,6 @@ char *ubl;
 char *fq;
 // For storing SHA-1
 char *sha1;
-
 
 // Element start tags.
 void start(void *data, const char *element, const char **Attribute)
@@ -58,7 +58,7 @@ void start(void *data, const char *element, const char **Attribute)
 		// Set flag
 		flag = 2;
 	}
-	if (strcmp(element, "SHA") == 0)
+	if (strcmp(element, "SHA1") == 0)
 	{
 		// Set flag
 		flag = 3;
@@ -159,20 +159,79 @@ char* FQ()
 	return fq;
 }
 
-// Test SHA fn - PENDING
+// Computes SHA-1
 char* shafunc(char buff[100000])
 {
-	return "f24e84445c27fdd906c828ce26a69222329235c4";
+	// Use 'buff' to generate a SHA-1 hash and return it.
+	// Process 'buff' and strip existing SHA-1 from it. 
+	//TESTING
+	char testbuf[2000];
+	strncpy(testbuf, buff, 2000);
+	// Strip existing SHA-1 from testbuf.
+	int shaflag = 0;
+	int kc = 0;
+	char testbuf2[2000];
+	char shatag[7] = "XXXXX";
+	for (int l = 0; testbuf[l] != '\0'; l++)
+	{
+		for (int k = 0; k < 5; k++)
+		{
+			shatag[k] = shatag[k + 1];
+		}
+		shatag[5] = testbuf[l];
+		shatag[6] = '\0';
+		if (strcmp(shatag, "<SHA1>") == 0)
+		{
+			testbuf2[kc] = testbuf[l];
+			kc++;
+			shaflag = 1;
+		}
+		
+		if (strcmp(shatag, "</SHA1") == 0)
+		{
+			testbuf2[kc] = '<';
+			kc++;
+			testbuf2[kc] = '/';
+			kc++;
+			testbuf2[kc] = 'S';
+			kc++;
+			testbuf2[kc] = 'H';
+			kc++;
+			testbuf2[kc] = 'A';
+			kc++;
+			shaflag = 0;
+		}
+		if (shaflag == 0)
+		{
+			testbuf2[kc] = testbuf[l];
+			kc++;
+		}
+	}
+	testbuf2[kc] = '\0';
+
+	const unsigned char* testhash = (const char*)testbuf2;
+	unsigned char hash[21];
+	//SHA1(testhash, sizeof(testhash) - 1, hash);
+	SHA_CTX ctx;
+	SHA1_Init(&ctx);
+	SHA1_Update(&ctx, testhash, strlen(testhash));
+	SHA1_Final(hash, &ctx);
+	char *digest = malloc(sizeof(char*)*(SHA_DIGEST_LENGTH * 2 + 1));
+	for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
+		sprintf(&digest[i * 2], "%02x", (unsigned int)hash[i]);
+	return digest;
 }
 
 int process(char buff[100000])
 {
 	filter(buff, 100000);
-	if (strcmp(sha1, shafunc(buff)) == 0)
+	char* digest = shafunc(buff);
+	//printf("\n%s\n", digest);
+	
+	if (strcmp(sha1, digest) == 0)
 	{
 		printf("Upstream Brokers List: \n%s", UBL());
 		printf("\nFiltering Query: %s \n", FQ());
-
 		// Deallocate
 		free(sha1);
 		free(ubl);
