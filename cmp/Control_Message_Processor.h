@@ -21,7 +21,7 @@
 #ifndef _CONTROL_MESSAGE_PROCESSOR_H
 #define _CONTROL_MESSAGE_PROCESSOR_H
 
-#include "globals.h"
+#include "globals2.h"
 
 /*
 * @desc Introduces a time-delay.
