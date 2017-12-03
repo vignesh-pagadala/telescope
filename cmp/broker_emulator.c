@@ -16,7 +16,7 @@
 * This file contains valid and invalid test-vectors for testing Control_Message_Processor's functionality.
 */
 
-#include "globals.h"
+#include "globals2.h"
 
 int main()
 {
