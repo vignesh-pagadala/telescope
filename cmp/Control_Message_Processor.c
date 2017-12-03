@@ -312,7 +312,7 @@ int_fast8_t filter(char *buff)
 int process(char *buff)
 {
 	int_fast8_t isValid;
-	isValid		= filter(buff);
+	isValid	= filter(buff);
 	if (isValid == 0)
 	{
 		printf("VALID. filter() returned %d.", isValid);
