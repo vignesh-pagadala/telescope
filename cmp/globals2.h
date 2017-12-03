@@ -31,10 +31,4 @@
 // Local
 #include "Control_Message_Processor.h"
 
-extern char *Control_Message_Processor_CONT;
-extern uint_fast8_t Control_Message_Processor_Flag;
-extern char *Control_Message_Processor_UBL;
-extern char *Control_Message_Processor_FQ;
-extern char *Control_Message_Processor_SHA1;
-
 #endif
