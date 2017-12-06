@@ -42,11 +42,38 @@ uint_fast8_t Control_Message_Processor_ROOT_ELEMENT_VALID = 0;
 uint_fast8_t Control_Message_Processor_ISVALID = 0;
 uint_fast8_t Control_Message_Processor_DEPTH = 0;
 uint_fast8_t Control_Message_Processor_CONTENT_FLAG = 0;
+uint_fast8_t Control_Message_Processor_ELEMENT_CASE = 0;
+uint_fast8_t Control_Message_Processor_ATTRIBUTE_CASE = 0;
+
 
 void delay(unsigned int seconds)
 {
 	int elapsed = time(0) + seconds;
 	while (time(0) < elapsed);
+}
+
+int isUpperCase(char* str)
+{
+	int flag = 0;
+	for (int i = 0; str[i] != '\0'; i++)
+	{
+		if (str[i] >= 'A' && str[i] <= 'Z')
+		{
+			;
+		}
+		else
+		{
+			flag = 1;
+		}
+	}
+	if (flag == 1)
+	{
+		return 0;
+	}
+	else
+	{
+		return 1;
+	}
 }
 
 // Expat handler for detecting element start tags.
@@ -60,6 +87,11 @@ void start(void *data, const char *element, const char **Attribute)
 		{
 			Control_Message_Processor_ROOT_ELEMENT_VALID = 1;
 		}
+	}
+
+	if (isUpperCase == 0)
+	{
+		Control_Message_Processor_ELEMENT_CASE = 1;
 	}
 
 	if (strcmp(element, "CRL_MESSAGE") == 0)
@@ -102,7 +134,13 @@ void start(void *data, const char *element, const char **Attribute)
 
 		if (Attribute[0] != NULL)
 		{
-			uint_fast8_t i;
+			if (Attribute[0][0] >= 'A' && Attribute[0][0] <= 'Z')
+				;
+			else
+			{
+				Control_Message_Processor_ATTRIBUTE_CASE = 1;
+			}
+			uint_fast16_t i;
 			for (i = 0; Attribute[i]; i += 2)
 			{
 				strcat(Control_Message_Processor_UBL, Attribute[i]);
@@ -133,6 +171,7 @@ void start(void *data, const char *element, const char **Attribute)
 // Expat handler for detecting element end tags.
 void end(void* data, const char* element)
 {
+	//printf("\nElement: %s Content: %s\n", element, Control_Message_Processor_CONT);
 	Control_Message_Processor_DEPTH--;
 	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0 && Control_Message_Processor_Flag == 4)
 	{
@@ -385,10 +424,11 @@ int_fast8_t filter(char *buff)
 	Control_Message_Processor_FQ_ELEMENT = 0;
 	Control_Message_Processor_ROOT_ELEMENT_VALID = 0;
 	Control_Message_Processor_ISVALID = 0;
-
+	Control_Message_Processor_ELEMENT_CASE = 0;
 	Control_Message_Processor_CONTENT_FLAG = 0;
 	Control_Message_Processor_Flag = 0;
 	Control_Message_Processor_DEPTH = 0;
+	Control_Message_Processor_ATTRIBUTE_CASE = 0;
 
 	Control_Message_Processor_UBL = NULL;
 	Control_Message_Processor_UBL = (char*)malloc(sizeof(char*) * CMP_MAX_UBL);
@@ -410,6 +450,7 @@ int_fast8_t filter(char *buff)
 	{
 		return -1;
 	}
+	XML_ParserFree(p);
 
 	// Root element.
 	if (Control_Message_Processor_ROOT_ELEMENT_VALID == 0)
@@ -428,9 +469,19 @@ int_fast8_t filter(char *buff)
 	{
 		return -1;
 	}
-	XML_ParserFree(p);
 
+	// Element case check. 
+	if (Control_Message_Processor_ELEMENT_CASE == 1)
+	{
+		return -1;
+	}
 	
+	// Attribute case check.
+	if (Control_Message_Processor_ATTRIBUTE_CASE == 1)
+	{
+		return -1;
+	}
+
 	// Check SHA-1 digest.
 	char* digest = shafunc(buff);
 	if (strcmp(Control_Message_Processor_SHA1, digest) == 0)
