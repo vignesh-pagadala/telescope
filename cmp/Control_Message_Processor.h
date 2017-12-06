@@ -14,24 +14,62 @@
 * This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit
 * (http://www.openssl.org/).
 *
-* File: Control_Message_Processor_Globals.h
-* -----------------------------------------
-* Standard and local library files.
+* File: Control_Message_Processor.h
+* ----------------------------------
+* Functions for parsing an XML control message, filtering out the Upstream Brokers List and Filtering 
+* Query from the message and performing validation using Secure Hash Algorithm 1.
 */
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef _CONTROL_MESSAGE_PROCESSOR_H
+#define _CONTROL_MESSAGE_PROCESSOR_H
 
-// Standard library
-#include<stdio.h>
-#include<string.h>
-#include<expat.h>
-#include<stdlib.h>
-#include<process.h>
-#include<openssl\sha.h>
-#include<time.h>
+#include "Control_Message_Processor_Globals.h"
 
-// Local
-#include "Control_Message_Processor.h"
+/*
+* @desc Calls filter(). For performing further processing.
+* @param The XML control message to be processed.
+* @return 0.
+*/
+int process(char *buff);
+
+/*
+* @desc Parses XML message and validates it.
+* @param The XML control message to be processed.
+* @return -1 if the message is invalid. 0 if valid.
+*/
+int_fast8_t filter(char *buff);
+
+/*
+* @desc Returns Upstream Brokers List of most recently process()ed control message.
+* @usage After a call to process() has been made; before a call to freeMem().
+* @return String with Upstream Brokers List.
+*/
+char* get_UBL(void);
+
+/*
+* @desc Returns Filtering Query of most recently process()ed control message.
+* @usage After a call to process(); before a call to freeMem().
+* @return String with Filtering Query.
+*/
+char* get_FQ(void);
+
+/*
+* @desc Computes SHA-1 digest of control message.
+* @param The XML control message who's SHA-1 is to be computed.
+* @return String with SHA-1 digest of the XML message (with empty SHA-1 element).
+*/
+char* shafunc(char *buff);
+
+/*
+* @desc Deallocates memory.
+* @usage After a call to process() and after optional calls to get_UBL() and get_FQ().
+*/
+void freeMem(void);
+
+/*
+* @desc Introduces a time-delay.
+* @param Number of seconds to delay.
+*/
+void delay(unsigned int seconds);
 
 #endif
