@@ -9,67 +9,103 @@
 *
 * Author: Vignesh M. Pagadala
 * Vignesh.Pagadala@colostate.edu
-* Last update: December 2nd, 2017
+* Last update: December 2017
+*
+* This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit
+* (http://www.openssl.org/).
 *
 * File: broker_emulator.c
-* ----------------------------------
-* This file contains valid and invalid test-vectors for testing Control_Message_Processor's functionality.
+* ------------------------
+* Valid and invalid test-vectors.
+* 
+* Compilation: 
+* gcc -g -Wall -I/expat.2.1.0.11/build/native/include -L/expat.2.1.0.11/build/native/lib/v100/Win32/Release/dynamic/utf8 -I/usr/OpenSSL-Win32/include -L/usr/OpenSSL-Win32/lib broker_emulator.c Control_Message_Processor.c -o broker_emulator_o -lexpat -lssl -lcrypto
 */
 
-#include "globals2.h"
+#include "Control_Message_Processor_Globals.h"
 
 int main()
 {
 	// Test vectors for control message processing.
-
+	
 	// 1. Valid message.
-	char validMsg[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>af54662f0e3ada437df84af8a70c8b54c329840d</SHA1></CRL_MESSAGE>";
+	char validMsg[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>f4162c0725c53bd885c44d3c5b4163af2867019d</SHA1></CRL_MESSAGE>";
 	printf("\n1. Valid message:\n %s\n\n", validMsg);
 	process(validMsg);
 	printf("\n\n");
-
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+	
 	// 2. Invalid message: Has incorrect SHA-1 digest.
-	char invalidMsg[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
+	char invalidMsg[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
 	printf("\n2. Invalid message (incorrect SHA-1 digest):\n %s\n\n", invalidMsg);
 	process(invalidMsg);
 	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
 
 	// 3. Invalid message: Not well-formed - bad ending.
-	char invalidMsg2[] = "<ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36";
+	char invalidMsg2[] = "<CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36";
 	printf("\n3. Invalid message (not well-formed with bad ending):\n %s\n\n", invalidMsg2);
 	process(invalidMsg2);
 	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
 
-	// 4. Invalid message: Not well-formed - tag imbalance (FilteringQuery's closing tag is missing). Has correct digest.
-	char invalidMsg3[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40<SHA1>937d544be89f5380468bd0f3081d4ae6d93796bd</SHA1></CRL_MESSAGE>";	
+	// 4. Invalid message: Not well-formed - tag imbalance (FILTERING_QUERY's closing tag is missing). Has correct digest.
+	char invalidMsg3[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40<SHA1>e4291296b5b28592c88c5e1f3f704794b38721bc</SHA1></CRL_MESSAGE>";	
 	printf("\n4. Invalid message (not well-formed with open/close tag imbalance):\n %s\n\n", invalidMsg3);
 	process(invalidMsg3);
 	printf("\n\n");
-
-	// 5. Invalid message: Has missing elements. In the following test-vector, 'RootBrokerID' is missing. Has correct digest.
-	char invalidMsg4[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>06a6efc6ff7a93e097ccac6d12dff48ab4e6c3e3</SHA1></CRL_MESSAGE>";
-	printf("\n5. Invalid message (missing elements - RootBrokerID missing):\n %s\n\n", invalidMsg4);
-	process(invalidMsg4);
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 
-	// 6. Invalid message: Contents of some elements (except UBL and FQ) are empty. In the following example, ChildBrokerID's contents are missing. Has correct digest.
-	char invalidMsg5[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID></ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>1b04d4e5a5bd6ea16a2bef7a06cdd337fc8521bc</SHA1></CRL_MESSAGE>";
-	printf("\n6. Invalid message (empty elements - ChildBrokerID empty):\n %s\n\n", invalidMsg5);
+	// 5. Invalid message: Has missing elements. In the following test-vector, 'ROOT_BROKER_ID' is missing. Has correct digest.
+	char invalidMsg4[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>614cf3d6e9d00533909d0129e17c0126484575b1</SHA1></CRL_MESSAGE>";
+	printf("\n5. Invalid message (missing elements - ROOT_BROKER_ID missing):\n %s\n\n", invalidMsg4);
+	process(invalidMsg4);
+	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
+	// 6. Invalid message: Contents of some elements (except UBL and FQ) are empty. In the following example, CHILD_BROKER_ID's contents are missing. Has correct digest.
+	char invalidMsg5[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID></CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>9b489008b5567667ef8642699923d1b388b874b6</SHA1></CRL_MESSAGE>";
+	printf("\n6. Invalid message (empty elements - CHILD_BROKER_ID empty):\n %s\n\n", invalidMsg5);
 	process(invalidMsg5);
+	printf("\n\n"); printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 
 	// 7. Valid message.
-	char validMsg2[] = "<CRL_MESSAGE length =\"0005130\"><ControlMessageLength>0005130</ControlMessageLength><ControlMessageID>ID0032</ControlMessageID><RootBrokerID>192.148.540.110:67400</RootBrokerID><ChildBrokerID>122.148.122.132:57850</ChildBrokerID><UBL><Broker1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND35</FilteringQuery><SHA1>199969a3d3bd35a096996a2e410c0624b7251cd1</SHA1></CRL_MESSAGE>";
+	char validMsg2[] = "<CRL_MESSAGE LENGTH =\"0005130\"><CONTROL_MESSAGE_LENGTH>0005130</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>44ba414084119532b287152d819e39fcf869c179</SHA1></CRL_MESSAGE>";
 	printf("\n7. Valid message:\n %s\n\n", validMsg2);
 	process(validMsg2);
 	printf("\n\n");
-	
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
+	// 8. Invalid message: Message is an XML data message, not a control message.
+	char invalidMsg6[] = "<XML_MESSAGE length=\"00003190\" symbol=\"ABT\"><Ask/><AverageDailyVolume>4638280</AverageDailyVolume><Bid/><AskRealtime>42.66</AskRealtime><BidRealtime>40.00</BidRealtime><BookValue>15.696</BookValue><Change_PercentChange>+0.58 - +1.41%</Change_PercentChange><Change>+0.58</Change><Commission/><Currency>USD</Currency><ChangeRealtime>+0.58</ChangeRealtime><AfterHoursChangeRealtime>N/A - N/A</AfterHoursChangeRealtime><DividendShare>0.80</DividendShare><LastTradeDate>10/3/2014</LastTradeDate><TradeDate/><EarningsShare>1.537</EarningsShare><ErrorIndicationreturnedforsymbolchangedinvalid/><EPSEstimateCurrentYear>2.23</EPSEstimateCurrentYear><EPSEstimateNextYear>2.46</EPSEstimateNextYear><EPSEstimateNextQuarter>0.68</EPSEstimateNextQuarter><DaysLow>41.275</DaysLow><DaysHigh>41.86</DaysHigh><YearLow>32.75</YearLow><YearHigh>44.20</YearHigh><HoldingsGainPercent>- - -</HoldingsGainPercent><AnnualizedGain/><HoldingsGain/><HoldingsGainPercentRealtime>N/A - N/A</HoldingsGainPercentRealtime><HoldingsGainRealtime/><MoreInfo>cnsprmiIed</MoreInfo><OrderBookRealtime/><MarketCapitalization>62.840B</MarketCapitalization><MarketCapRealtime/><EBITDA>4.508B</EBITDA><ChangeFromYearLow>+9.04</ChangeFromYearLow><PercentChangeFromYearLow>+27.60%</PercentChangeFromYearLow><LastTradeRealtimeWithTime>N/A - &lt;b&gt;41.79&lt;/b&gt;</LastTradeRealtimeWithTime><ChangePercentRealtime>N/A - +1.41%</ChangePercentRealtime><ChangeFromYearHigh>-2.41</ChangeFromYearHigh><PercebtChangeFromYearHigh>-5.45%</PercebtChangeFromYearHigh><LastTradeWithTime>Oct  3 - &lt;b&gt;41.79&lt;/b&gt;</LastTradeWithTime><LastTradePriceOnly>41.79</LastTradePriceOnly><HighLimit/><LowLimit/><DaysRange>41.275 - 41.86</DaysRange><DaysRangeRealtime>N/A - N/A</DaysRangeRealtime><FiftydayMovingAverage>42.4775</FiftydayMovingAverage><TwoHundreddayMovingAverage>40.6536</TwoHundreddayMovingAverage><ChangeFromTwoHundreddayMovingAverage>+1.1364</ChangeFromTwoHundreddayMovingAverage><PercentChangeFromTwoHundreddayMovingAverage>+2.80%</PercentChangeFromTwoHundreddayMovingAverage><ChangeFromFiftydayMovingAverage>-0.6875</ChangeFromFiftydayMovingAverage><PercentChangeFromFiftydayMovingAverage>-1.62%</PercentChangeFromFiftydayMovingAverage><Name>Abbott Laboratori</Name><Notes/><Open>41.41</Open><PreviousClose>41.21</PreviousClose><PricePaid/><ChangeinPercent>+1.41%</ChangeinPercent><PriceSales>2.84</PriceSales><PriceBook>2.63</PriceBook><ExDividendDate>Jul 11</ExDividendDate><PERatio>26.81</PERatio><DividendPayDate>Nov 15</DividendPayDate><PERatioRealtime/><PEGRatio>1.74</PEGRatio><PriceEPSEstimateCurrentYear>18.48</PriceEPSEstimateCurrentYear><PriceEPSEstimateNextYear>16.75</PriceEPSEstimateNextYear><Symbol>ABT</Symbol><SharesOwned/><ShortRatio>2.90</ShortRatio><LastTradeTime>4:00pm</LastTradeTime><TickerTrend>&amp;nbsp;=-+===&amp;nbsp;</TickerTrend><OneyrTargetPrice>44.38</OneyrTargetPrice><Volume>3430933</Volume><HoldingsValue/><HoldingsValueRealtime/><YearRange>32.75 - 44.20</YearRange><DaysValueChange>- - +1.41%</DaysValueChange><DaysValueChangeRealtime>N/A - N/A</DaysValueChangeRealtime><StockExchange>NYSE</StockExchange><DividendYield>1.94</DividendYield><PercentChange>+1.41%</PercentChange></XML_MESSAGE>";
+	printf("\n8. Invalid message (message is an XML data message, not a control message):\n %s\n\n", invalidMsg6);
+	process(invalidMsg6);
+	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
+	freeMem();
 
 	// Unit tests for SHA-1 validation.
 
 	// 1. Authentic message. 
-	char authMsg1[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>af54662f0e3ada437df84af8a70c8b54c329840d</SHA1></CRL_MESSAGE>";
-	char shamsg[] = "af54662f0e3ada437df84af8a70c8b54c329840d";
+	char authMsg1[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>f4162c0725c53bd885c44d3c5b4163af2867019d</SHA1></CRL_MESSAGE>";
+	char shamsg[] = "f4162c0725c53bd885c44d3c5b4163af2867019d";
 	if (strcmp(shafunc(authMsg1), shamsg) == 0)
 	{
 		printf("The message \n\n %s \n\n is valid.\n\n\n", authMsg1);
@@ -80,7 +116,7 @@ int main()
 	}
 
 	// 2. Forged message.
-	char forgedMsg1[] = "<CRL_MESSAGE length =\"0000500\"><ControlMessageLength>0000500</ControlMessageLength><ControlMessageID>CM0002</ControlMessageID><RootBrokerID>192.168.100.1:50000</RootBrokerID><ChildBrokerID>192.168.102.1:55550</ChildBrokerID><UBL><Broker1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND40</FilteringQuery><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
+	char forgedMsg1[] = "<CRL_MESSAGE LENGTH =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
 	char shamsg2[] = "a14f51c827d71674d746a30dd68ae32fba8f5c36";
 	if (strcmp(shafunc(forgedMsg1), shamsg2) == 0)
 	{
@@ -92,8 +128,8 @@ int main()
 	}
 
 	// 3. Authentic message.
-	char authMsg2[] = "<CRL_MESSAGE length =\"0005130\"><ControlMessageLength>0005130</ControlMessageLength><ControlMessageID>ID0032</ControlMessageID><RootBrokerID>192.148.540.110:67400</RootBrokerID><ChildBrokerID>122.148.122.132:57850</ChildBrokerID><UBL><Broker1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></Broker1><Broker2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></Broker2><Broker3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></Broker3><Broker4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></Broker4></UBL><FilteringQuery>Industry = IND35</FilteringQuery><SHA1>199969a3d3bd35a096996a2e410c0624b7251cd1</SHA1></CRL_MESSAGE>";
-	char shamsg3[] = "199969a3d3bd35a096996a2e410c0624b7251cd1";
+	char authMsg2[] = "<CRL_MESSAGE LENGTH =\"0005130\"><CONTROL_MESSAGE_LENGTH>0005130</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>44ba414084119532b287152d819e39fcf869c179</SHA1></CRL_MESSAGE>";
+	char shamsg3[] = "44ba414084119532b287152d819e39fcf869c179";
 	if (strcmp(shafunc(authMsg2), shamsg3) == 0)
 	{
 		printf("The message \n\n %s \n\n is valid.\n\n\n", authMsg1);
