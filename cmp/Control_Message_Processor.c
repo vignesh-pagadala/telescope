@@ -142,14 +142,12 @@ void end(void* data, const char* element)
 	// For UBL
 	if (Control_Message_Processor_Flag == 1)
 	{
-		
-
 		if (strcmp(element, "UBL") == 0)
 		{
 			Control_Message_Processor_Flag = 0;
 		}
 
-		if (strstr(element, "Broker") == 0)
+		if (strstr(element, "BROKER") != NULL)
 		{
 			strcat(Control_Message_Processor_UBL, "\n");
 		}
