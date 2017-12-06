@@ -9,57 +9,29 @@
 *
 * Author: Vignesh M. Pagadala
 * Vignesh.Pagadala@colostate.edu
-* Last update: December 2nd, 2017
+* Last update: December 2017
 *
-* File: Control_Message_Processor.h
-* ----------------------------------
-* This header file contains functions for parsing an XML control message, filtering out the
-* Upstream Brokers List and Filtering Query from the message and performing validation using
-* Secure Hash Algorithm 1.
+* This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit
+* (http://www.openssl.org/).
+*
+* File: Control_Message_Processor_Globals.h
+* -----------------------------------------
+* Standard and local library files.
 */
 
-#ifndef _CONTROL_MESSAGE_PROCESSOR_H
-#define _CONTROL_MESSAGE_PROCESSOR_H
+#ifndef GLOBALS_H
+#define GLOBALS_H
 
-#include "globals2.h"
+// Standard library
+#include<stdio.h>
+#include<string.h>
+#include<expat.h>
+#include<stdlib.h>
+#include<process.h>
+#include<openssl\sha.h>
+#include<time.h>
 
-/*
-* @desc Introduces a time-delay.
-* @param Number of seconds to delay.
-*/
-void delay(unsigned int seconds);
-
-/*
-* @desc Returns Upstream Brokers List.
-* @return String with Upstream Brokers List.
-*/
-char* UBL();
-
-/*
-* @desc Returns Filtering Query.
-* @return String with Filtering Query.
-*/
-char* FQ();
-
-/*
-* @desc Computes SHA-1 digest.
-* @param The XML control message who's SHA-1 is to be computed.
-* @return String with SHA-1 digest of the XML message (with empty SHA-1 element).
-*/
-char* shafunc(char *buff);
-
-/*
-* @desc Parses XML message and validates it. 
-* @param The XML control message to be processed.
-* @return -1 if the message is invalid. 0 if valid.
-*/
-int_fast8_t filter(char *buff);
-
-/*
-* @desc Calls filter(). For performing further processing.
-* @param The XML control message to be processed.
-* @return 0.
-*/
-int process(char *buff);
+// Local
+#include "Control_Message_Processor.h"
 
 #endif
