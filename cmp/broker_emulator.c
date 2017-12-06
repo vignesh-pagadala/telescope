@@ -117,17 +117,25 @@ int main()
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 	
-	// 11. Valid message: more brokers.
-	char validMsg3[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4><BROKER5 IP = \"119.32.45.260\" Port = \"8438\" NameID = \"rho\" Priority = \"02\"></BROKER5><BROKER6 IP = \"149.84.46.280\" Port = \"88\" NameID = \"phi\" Priority = \"07\"></BROKER6></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>faaf180a9f65b95d048f48fd1b2d3bafe68cfbb6</SHA1></CRL_MESSAGE>";
-	printf("\n11. Valid message: more brokers.\n %s\n\n", validMsg3);
+	// 11. Valid message: more brokers - 10.
+	char validMsg3[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4><BROKER5 IP = \"119.32.45.260\" Port = \"8438\" NameID = \"rho\" Priority = \"02\"></BROKER5><BROKER6 IP = \"149.84.46.280\" Port = \"88\" NameID = \"phi\" Priority = \"07\"></BROKER6><BROKER7 IP = \"149.44.45.280\" Port = \"8658\" NameID = \"eta\" Priority = \"10\"></BROKER7><BROKER8 IP = \"159.84.66.280\" Port = \"8800\" NameID = \"nabla\" Priority = \"07\"></BROKER8><BROKER9 IP = \"149.64.46.280\" Port = \"88\" NameID = \"omega\" Priority = \"13\"></BROKER9><BROKER10 IP = \"149.84.46.241\" Port = \"88\" NameID = \"mu\" Priority = \"07\"></BROKER10></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>46c5e95e1ab400976fa31b3831024db68b4dde81</SHA1></CRL_MESSAGE>";
+	printf("\n11. Valid message: more brokers - 10.\n %s\n\n", validMsg3);
 	process(validMsg3);
 	printf("\n\n");
 	printf("Upstream Brokers List: \n%s", get_UBL());
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 
+	// 12. Valid message: 2 brokers.
+	char validMsg4[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>9b855f85c4567cc18bbc005ab6a8057db02c7758</SHA1></CRL_MESSAGE>";
+	printf("\n12. Valid message: 2 brokers.\n %s\n\n", validMsg4);
+	process(validMsg4);
+	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
 	freeMem();
-	
 	// Unit tests for SHA-1 validation.
 
 	// 1. Authentic message. 
@@ -165,7 +173,6 @@ int main()
 	{
 		printf("The message \n\n %s \n\n is invalid.\n\n\n", authMsg2);
 	}
-	
 	getchar();
 	return 0;
 }
