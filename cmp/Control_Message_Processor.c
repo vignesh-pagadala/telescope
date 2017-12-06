@@ -9,21 +9,39 @@
 *
 * Author: Vignesh M. Pagadala
 * Vignesh.Pagadala@colostate.edu
-* Last update: December 2nd, 2017 
+* Last update: December 2017 
 *
+* This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit 
+* (http://www.openssl.org/).
+* 
 * File: Control_Message_Processor.C
 * ----------------------------------
-* Contains functions for parsing an XML control message, filtering out the Upstream Brokers List 
-* and Filtering Query from the message and performing validation using Secure Hash Algorithm 1.
+* For parsing an XML control message, filtering out the Upstream Brokers List and Filtering Query 
+* from the message and performing validation using Secure Hash Algorithm 1.
 */
 
 #include "Control_Message_Processor.h"
 
-char *Control_Message_Processor_CONT;
+#define CMP_MAX_UBL 100000
+
+char *Control_Message_Processor_CONT = NULL;
 uint_fast8_t Control_Message_Processor_Flag = 0;
-char *Control_Message_Processor_UBL;
-char *Control_Message_Processor_FQ;
-char *Control_Message_Processor_SHA1;
+char *Control_Message_Processor_UBL = NULL;
+char *Control_Message_Processor_FQ = NULL;
+char *Control_Message_Processor_SHA1 = NULL;
+
+uint_fast8_t Control_Message_Processor_CRL_MESSAGE_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_CONTROLMESSAGELENGTH_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_CONTROLMESSAGEID_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_ROOTBROKERID_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_CHILDBROKERID_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_UBL_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_SHA1_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_FQ_ELEMENT = 0;
+uint_fast8_t Control_Message_Processor_ROOT_ELEMENT_VALID = 0;
+uint_fast8_t Control_Message_Processor_ISVALID = 0;
+uint_fast8_t Control_Message_Processor_DEPTH = 0;
+uint_fast8_t Control_Message_Processor_CONTENT_FLAG = 0;
 
 void delay(unsigned int seconds)
 {
@@ -34,6 +52,49 @@ void delay(unsigned int seconds)
 // Expat handler for detecting element start tags.
 void start(void *data, const char *element, const char **Attribute)
 {
+	Control_Message_Processor_DEPTH++;
+
+	if (Control_Message_Processor_DEPTH == 1)
+	{
+		if (strcmp(element, "CRL_MESSAGE") == 0)
+		{
+			Control_Message_Processor_ROOT_ELEMENT_VALID = 1;
+		}
+	}
+
+	if (strcmp(element, "CRL_MESSAGE") == 0)
+	{
+		Control_Message_Processor_CRL_MESSAGE_ELEMENT = 1;
+	}
+	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0)
+	{
+		Control_Message_Processor_CONTROLMESSAGELENGTH_ELEMENT = 1;
+	}
+	if (strcmp(element, "CONTROL_MESSAGE_ID") == 0)
+	{
+		Control_Message_Processor_CONTROLMESSAGEID_ELEMENT = 1;
+	}
+	if (strcmp(element, "ROOT_BROKER_ID") == 0)
+	{
+		Control_Message_Processor_ROOTBROKERID_ELEMENT = 1;
+	}
+	if (strcmp(element, "CHILD_BROKER_ID") == 0)
+	{
+		Control_Message_Processor_CHILDBROKERID_ELEMENT = 1;
+	}
+	if (strcmp(element, "UBL") == 0)
+	{
+		Control_Message_Processor_UBL_ELEMENT = 1;
+	}
+	if (strcmp(element, "SHA1") == 0)
+	{
+		Control_Message_Processor_SHA1_ELEMENT = 1;
+	}
+	if (strcmp(element, "FILTERING_QUERY") == 0)
+	{
+		Control_Message_Processor_FQ_ELEMENT = 1;
+	}
+
 	if (Control_Message_Processor_Flag == 1)
 	{
 		strcat(Control_Message_Processor_UBL, element);
@@ -55,7 +116,7 @@ void start(void *data, const char *element, const char **Attribute)
 	{
 		Control_Message_Processor_Flag = 1;
 	}
-	if (strcmp(element, "FilteringQuery") == 0)
+	if (strcmp(element, "FILTERING_QUERY") == 0)
 	{
 		Control_Message_Processor_Flag = 2;
 	}
@@ -63,7 +124,7 @@ void start(void *data, const char *element, const char **Attribute)
 	{
 		Control_Message_Processor_Flag = 3;
 	}
-	if (strcmp(element, "ControlMessageLength") == 0)
+	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0)
 	{
 		Control_Message_Processor_Flag = 4;
 	}
@@ -72,28 +133,23 @@ void start(void *data, const char *element, const char **Attribute)
 // Expat handler for detecting element end tags.
 void end(void* data, const char* element)
 {
-	if (strcmp(element, "ControlMessageLength") == 0 && Control_Message_Processor_Flag == 4)
+	Control_Message_Processor_DEPTH--;
+	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0 && Control_Message_Processor_Flag == 4)
 	{
-		Control_Message_Processor_UBL = (char*)malloc(sizeof(char*) * atoi(Control_Message_Processor_CONT));
-		if (Control_Message_Processor_UBL == NULL)
-		{
-			perror("Error: Could not allocate memory for Upstream Brokers List buffer. \n Terminating program...");
-			delay(1);
-			exit(0);
-		}
-		*Control_Message_Processor_UBL = '\0';
 		Control_Message_Processor_Flag = 0;
 	}
-
+	
 	// For UBL
 	if (Control_Message_Processor_Flag == 1)
 	{
+		
+
 		if (strcmp(element, "UBL") == 0)
 		{
 			Control_Message_Processor_Flag = 0;
 		}
 
-		if (strcmp(element, "Broker1") == 0 || strcmp(element, "Broker2") == 0 || strcmp(element, "Broker3") == 0 || strcmp(element, "Broker4") == 0)
+		if (strstr(element, "Broker") == 0)
 		{
 			strcat(Control_Message_Processor_UBL, "\n");
 		}
@@ -102,16 +158,17 @@ void end(void* data, const char* element)
 	// For FQ.
 	if (Control_Message_Processor_Flag == 2)
 	{
+		Control_Message_Processor_FQ = NULL;
 		Control_Message_Processor_FQ = (char*)malloc(sizeof(char) * (strlen(Control_Message_Processor_CONT) + 1));
 		if (Control_Message_Processor_FQ == NULL)
 		{
-			perror("Error: Could not allocate memory for Filtering Query buffer. \n Terminating program...");
+			perror("\nError: Could not allocate memory for Filtering Query buffer. \n Terminating program...");
 			delay(1);
 			exit(0);
 		}
 		*Control_Message_Processor_FQ = '\0';
 		strcat(Control_Message_Processor_FQ, Control_Message_Processor_CONT);
-		if (strcmp(element, "FilteringQuery") == 0)
+		if (strcmp(element, "FILTERING_QUERY") == 0)
 		{
 			Control_Message_Processor_Flag = 0;
 		}
@@ -120,45 +177,86 @@ void end(void* data, const char* element)
 	// For SHA-1.
 	if (Control_Message_Processor_Flag == 3)
 	{
+		Control_Message_Processor_SHA1 = NULL;
 		Control_Message_Processor_SHA1 = (char*)malloc(sizeof(char) * (strlen(Control_Message_Processor_CONT) + 1));
 		if (Control_Message_Processor_SHA1 == NULL)
 		{
-			perror("Error: Could not allocate memory for SHA-1 digest buffer. \n Terminating program...");
+			perror("\nError: Could not allocate memory for SHA-1 digest buffer. \n Terminating program...");
 			delay(1);
 			exit(0);
 		}
 		*Control_Message_Processor_SHA1 = '\0';
 		strcat(Control_Message_Processor_SHA1, Control_Message_Processor_CONT);
-		if (strcmp(element, "SHA") == 0)
+		
+		if (strcmp(element, "SHA1") == 0)
 		{
 			Control_Message_Processor_Flag = 0;
 		}
+
 	}
+	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0 || strcmp(element, "ROOT_BROKER_ID") == 0 || strcmp(element, "CHILD_BROKER_ID") == 0 || strcmp(element, "SHA1") == 0)
+	{
+		if (strcmp(Control_Message_Processor_CONT, "") == 0)
+		{
+			Control_Message_Processor_CONTENT_FLAG = 1;
+		}
+	}
+	strcpy(Control_Message_Processor_CONT, "");
 }
 
 // Expat handler for getting contents.
 void content(void *data, const char *content, int length)
 {
-	char *temp = (char*)malloc(sizeof(char*) * length);
+	char *temp = NULL;
+	temp = (char*)malloc(sizeof(char*) * length);
 	if (temp == NULL)
 	{
-		perror("Error: Could not allocate memory for content buffer. \n Terminating program...");
+		perror("\nError: Could not allocate memory for content buffer. \n Terminating program...");
 		delay(1);
 		exit(0);
 	}
 	strncpy(temp, content, length);
 	temp[length] = '\0';
+	data = (void*)temp;
 	Control_Message_Processor_CONT = temp;
 }
 
-char* UBL()
+char* get_UBL()
 {
-	return Control_Message_Processor_UBL;
+	if (Control_Message_Processor_UBL == NULL)
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Memory not allocated. Incorrect usage of get_UBL.\n");
+		delay(1);
+		exit(0);
+	}
+	if (Control_Message_Processor_ISVALID == 1)
+	{
+		return Control_Message_Processor_UBL;
+	}
+	else
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Invalid message.\n");
+		return NULL;
+	}
 }
 
-char* FQ()
+char* get_FQ()
 {
-	return Control_Message_Processor_FQ;
+	if (Control_Message_Processor_FQ == NULL)
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Memory not allocated. Incorrect usage of get_FQ.\n");
+		delay(1);
+		exit(0);
+	}
+	if (Control_Message_Processor_ISVALID == 1)
+	{
+		return Control_Message_Processor_FQ;
+	}
+	else
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Invalid message.\n");
+		return NULL;
+	}
 }
 
 char* shafunc(char *buff)
@@ -172,10 +270,11 @@ char* shafunc(char *buff)
 
 	uint_fast16_t Buffer_Length = strlen(buff) + 1;
 
-	char *testbuf = (char*)malloc(sizeof(char*) * Buffer_Length);
+	char *testbuf = NULL;
+	testbuf = (char*)malloc(sizeof(char*) * Buffer_Length);
 	if (testbuf == NULL)
 	{
-		perror("Error: Could not allocate memory for testbuf. \n Terminating program...");
+		perror("\nError: Could not allocate memory for testbuf. \n Terminating program...");
 		delay(1);
 		exit(0);
 	}
@@ -184,10 +283,11 @@ char* shafunc(char *buff)
 	uint_fast8_t shaflag = 0;
 	uint_fast16_t kc = 0;
 
-	char *testbuf2 = (char*)malloc(sizeof(char*) * Buffer_Length);
+	char *testbuf2 = NULL;
+	testbuf2 = (char*)malloc(sizeof(char*) * Buffer_Length);
 	if (testbuf2 == NULL)
 	{
-		perror("Error: Could not allocate memory for testbuf2. \n Terminating program...");
+		perror("\nError: Could not allocate memory for testbuf2. \n Terminating program...");
 		delay(1);
 		exit(0);
 	}
@@ -229,13 +329,18 @@ char* shafunc(char *buff)
 		}
 	}
 	testbuf2[kc] = '\0';
-	free(testbuf);
+	if (testbuf != NULL)
+	{
+		free(testbuf);
+		testbuf = NULL;
+	}
 
 	const char* testhash = (const char*)testbuf2;
-	unsigned char *hash = (unsigned char*)malloc(sizeof(char*) * (SHA_DIGEST_LENGTH * 2 + 1));
+	unsigned char *hash = NULL;
+	hash = (unsigned char*)malloc(sizeof(char*) * (SHA_DIGEST_LENGTH * 2 + 1));
 	if (hash == NULL)
 	{
-		perror("Error: Could not allocate memory for hash. \n Terminating program...");
+		perror("\nError: Could not allocate memory for hash. \n Terminating program...");
 		delay(1);
 		exit(0);
 	}
@@ -245,67 +350,128 @@ char* shafunc(char *buff)
 	SHA1_Update(&context, testhash, strlen(testhash));
 	SHA1_Final(hash, &context);
 
-	char *digest = (char*)malloc(sizeof(char*)*(SHA_DIGEST_LENGTH * 2 + 1));
+	char *digest = NULL;
+	digest = (char*)malloc(sizeof(char*)*(SHA_DIGEST_LENGTH * 2 + 1));
 	if (digest == NULL)
 	{
-		perror("Error: Could not allocate memory for digest. \n Terminating program...");
+		perror("\nError: Could not allocate memory for digest. \n Terminating program...");
 		delay(1);
 		exit(0);
 	}
 	for (uint_fast8_t i = 0; i < SHA_DIGEST_LENGTH; i++)
 		sprintf(&digest[i * 2], "%02x", (unsigned int)hash[i]);
-	free(testbuf2);
-	free(hash);
+
+	if (testbuf2 != NULL)
+	{
+		free(testbuf2);
+		testbuf2 = NULL;
+	}
+	if (hash != NULL)
+	{
+		free(hash);
+		hash = NULL;
+	}
 
 	return digest;
 }
 
 int_fast8_t filter(char *buff)
 {
-	// If any element is missing, return -1.
-	if (strstr(buff, "<CRL_MESSAGE length") == NULL || strstr(buff, "<ControlMessageLength>") == NULL || strstr(buff, "<ControlMessageID>") == NULL || strstr(buff, "<RootBrokerID>") == NULL || strstr(buff, "<ChildBrokerID>") == NULL || strstr(buff, "<UBL>") == NULL || strstr(buff, "<FilteringQuery>") == NULL || strstr(buff, "<SHA1>") == NULL)
+	Control_Message_Processor_CRL_MESSAGE_ELEMENT = 0;
+	Control_Message_Processor_CONTROLMESSAGELENGTH_ELEMENT = 0;
+	Control_Message_Processor_CONTROLMESSAGEID_ELEMENT = 0;
+	Control_Message_Processor_ROOTBROKERID_ELEMENT = 0;
+	Control_Message_Processor_CHILDBROKERID_ELEMENT = 0;
+	Control_Message_Processor_UBL_ELEMENT = 0;
+	Control_Message_Processor_SHA1_ELEMENT = 0;
+	Control_Message_Processor_FQ_ELEMENT = 0;
+	Control_Message_Processor_ROOT_ELEMENT_VALID = 0;
+	Control_Message_Processor_ISVALID = 0;
+
+	Control_Message_Processor_CONTENT_FLAG = 0;
+	Control_Message_Processor_Flag = 0;
+	Control_Message_Processor_DEPTH = 0;
+
+	Control_Message_Processor_UBL = NULL;
+	Control_Message_Processor_UBL = (char*)malloc(sizeof(char*) * CMP_MAX_UBL);
+	if (Control_Message_Processor_UBL == NULL)
 	{
-		return -1;
+		perror("\nError: Could not allocate memory for Upstream Brokers List buffer. \n Terminating program...");
+		delay(1);
+		exit(0);
 	}
-	// If any element (except UBL and FQ) is empty, return -1.
-	if (strstr(buff, "<ControlMessageLength></ControlMessageLength>") != NULL || strstr(buff, "<ControlMessageID></ControlMessageID>") != NULL || strstr(buff, "<RootBrokerID></RootBrokerID>") != NULL || strstr(buff, "<ChildBrokerID></ChildBrokerID>") != NULL || strstr(buff, "<FilteringQuery></FilteringQuery>") != NULL || strstr(buff, "<SHA1></SHA1>") != NULL)
-	{
-		return -1;
-	}
+	*Control_Message_Processor_UBL = '\0';
 
 	// Initiate parse.
 	XML_Parser p = XML_ParserCreate(NULL);
 	XML_SetElementHandler(p, start, end);
 	XML_SetCharacterDataHandler(p, content);
 
-	// If XML message isn't well-formed, return -1.
+	// Not well formed.
 	if (XML_Parse(p, buff, strlen(buff), XML_TRUE) == XML_STATUS_ERROR)
+	{
+		return -1;
+	}
+
+	// Root element.
+	if (Control_Message_Processor_ROOT_ELEMENT_VALID == 0)
+	{
+		return -1;
+	}
+
+	// Missing elements.
+	if (Control_Message_Processor_CRL_MESSAGE_ELEMENT == 0 || Control_Message_Processor_CONTROLMESSAGELENGTH_ELEMENT == 0 || Control_Message_Processor_CONTROLMESSAGEID_ELEMENT == 0 || Control_Message_Processor_ROOTBROKERID_ELEMENT == 0 || Control_Message_Processor_CHILDBROKERID_ELEMENT == 0 || Control_Message_Processor_UBL_ELEMENT == 0 || Control_Message_Processor_FQ_ELEMENT == 0 || Control_Message_Processor_SHA1_ELEMENT == 0)
+	{
+		return -1;	
+	}
+
+	// If any element (except UBL and FQ) is empty, return -1.
+	if(Control_Message_Processor_CONTENT_FLAG == 1)
 	{
 		return -1;
 	}
 	XML_ParserFree(p);
 
+	
+	// Check SHA-1 digest.
 	char* digest = shafunc(buff);
-
 	if (strcmp(Control_Message_Processor_SHA1, digest) == 0)
 	{
-		//printf("Upstream Brokers List: \n%s", UBL());
-		//printf("\nFiltering Query: %s \n", FQ());
-		free(digest);
-		free(Control_Message_Processor_SHA1);
-		free(Control_Message_Processor_FQ);
-		free(Control_Message_Processor_UBL);
-		free(Control_Message_Processor_CONT);
+		if (digest != NULL)
+		{
+			free(digest);
+			digest = NULL;
+		}
+		Control_Message_Processor_ISVALID = 1;
 		return 0;
 	}
 	else
 	{
-		free(digest);
-		free(Control_Message_Processor_SHA1);
-		free(Control_Message_Processor_FQ);
-		free(Control_Message_Processor_UBL);
-		free(Control_Message_Processor_CONT);
 		return -1;
+	}
+}
+
+void freeMem()
+{
+	if (Control_Message_Processor_SHA1 != NULL && Control_Message_Processor_FQ != NULL && Control_Message_Processor_UBL != NULL && Control_Message_Processor_CONT != NULL)
+	{
+		free(Control_Message_Processor_SHA1);
+		Control_Message_Processor_SHA1 = NULL;
+
+		free(Control_Message_Processor_FQ);
+		Control_Message_Processor_FQ = NULL;
+
+		free(Control_Message_Processor_UBL);
+		Control_Message_Processor_UBL = NULL;
+
+		free(Control_Message_Processor_CONT);
+		Control_Message_Processor_CONT = NULL;
+	}
+	else
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: A call to Control_Message_Processor.freeMem should always be preceded by a call to Control_Message_Processor.process.\n");
+		delay(1);
+		exit(0);
 	}
 }
 
@@ -323,3 +489,5 @@ int process(char *buff)
 	}
 	return 0;
 }
+
+
