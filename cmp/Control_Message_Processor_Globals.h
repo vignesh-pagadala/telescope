@@ -9,11 +9,14 @@
 *
 * Author: Vignesh M. Pagadala
 * Vignesh.Pagadala@colostate.edu
-* Last update: December 2nd, 2017
+* Last update: December 2017
 *
-* File: globals2.h
-* ----------------------------------
-* Contains all standard and local library functions and global variables.
+* This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit
+* (http://www.openssl.org/).
+*
+* File: Control_Message_Processor_Globals.h
+* -----------------------------------------
+* Standard and local library files.
 */
 
 #ifndef GLOBALS_H
