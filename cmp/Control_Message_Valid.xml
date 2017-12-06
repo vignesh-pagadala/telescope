@@ -1,14 +1,14 @@
-<CRL_MESSAGE length = "0000700">
-<ControlMessageLength>0000700</ControlMessageLength>
-<ControlMessageID>CM0893</ControlMessageID>
-<RootBrokerID>192.168.100.1:50550</RootBrokerID>
-<ChildBrokerID>192.168.103.1:66750</ChildBrokerID>
-<UBL>
-<Broker1 IP = "129.82.47.128" Port = "8090" NameID = "eta" Priority = "60"></Broker1>
-<Broker2 IP = "129.82.47.264" Port = "8070" NameID = "phi" Priority = "10"></Broker2>
-<Broker3 IP = "129.82.47.232" Port = "5020" NameID = "rho" Priority = "5"></Broker3>
-<Broker4 IP = "129.82.47.280" Port = "8338" NameID = "delta" Priority = "0"></Broker4>
-</UBL>
-<FilteringQuery>Industry = IND45</FilteringQuery>
-<SHA1>af54662f0e3ada437df84af8a70c8b54c329840d</SHA1>
+<CRL_MESSAGE LENGTH ="0000500">
+	<CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH>
+	<CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID>
+	<ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID>
+	<CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID>
+	<UBL>
+		<BROKER1 IP = "129.82.47.138" Port = "80" NameID = "alpha" Priority = "60"></BROKER1>
+		<BROKER2 IP = "129.82.47.234" Port = "8080" NameID = "beta" Priority = "10"></BROKER2>
+		<BROKER3 IP = "129.82.47.242" Port = "5050" NameID = "gamma" Priority = "5"></BROKER3>
+		<BROKER4 IP = "129.82.47.230" Port = "8888" NameID = "delta" Priority = "0"></BROKER4>
+	</UBL>
+	<FILTERING_QUERY>Industry = IND40</FILTERING_QUERY>
+	<SHA1>f4162c0725c53bd885c44d3c5b4163af2867019d</SHA1>
 </CRL_MESSAGE>
