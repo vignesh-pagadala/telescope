@@ -576,11 +576,10 @@ int process(char *buff)
 	isValid	= filter(buff);
 	if (isValid == 0)
 	{
-		printf("VALID. filter() returned %d.", isValid);
+		return 0;
 	}
 	else
 	{
-		printf("INVALID. filter() returned %d.", isValid);
+		return -1;
 	}
-	return 0;
 }
