@@ -29,16 +29,17 @@ int main()
 	// Test vectors for control message processing.
 	
 	// 1. Valid message.
-	char validMsg[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>eba5584b054894c38a75a18f7578013489586dd5</SHA1></CRL_MESSAGE>";
+	char validMsg[] = "<CRL_MESSAGE Length =\"0000712\"><CONTROL_MESSAGE_LENGTH>0000712</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>bae3ef3b79489e75fc191657050cc271aa1a069c</SHA1></CRL_MESSAGE>";
 	printf("\n1. Valid message:\n %s\n\n", validMsg);
 	process(validMsg);
 	printf("\n\n");
+	printUBL();
 	printf("Upstream Brokers List: \n%s", get_UBL());
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 	
 	// 2. Invalid message: Has incorrect SHA-1 digest.
-	char invalidMsg[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
+	char invalidMsg[] = "<CRL_MESSAGE Length =\"0000712\"><CONTROL_MESSAGE_LENGTH>0000712</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
 	printf("\n2. Invalid message (incorrect SHA-1 digest):\n %s\n\n", invalidMsg);
 	process(invalidMsg);
 	printf("\n\n");
@@ -47,7 +48,7 @@ int main()
 	printf("\n\n");
 
 	// 3. Invalid message: Not well-formed - bad ending.
-	char invalidMsg2[] = "<CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36";
+	char invalidMsg2[] = "<CONTROL_MESSAGE_LENGTH>0000660</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36";
 	printf("\n3. Invalid message (not well-formed with bad ending):\n %s\n\n", invalidMsg2);
 	process(invalidMsg2);
 	printf("\n\n");
@@ -56,7 +57,7 @@ int main()
 	printf("\n\n");
 
 	// 4. Invalid message: Not well-formed - tag imbalance (FILTERING_QUERY's closing tag is missing). Has correct digest.
-	char invalidMsg3[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40<SHA1>6628e23d77e16a33af51b331d8692bb41c59390f</SHA1></CRL_MESSAGE>";	
+	char invalidMsg3[] = "<CRL_MESSAGE Length =\"0000694\"><CONTROL_MESSAGE_LENGTH>0000694</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40<SHA1>630db5c09736e02f55dd9c734dd92b549ba9e27e</SHA1></CRL_MESSAGE>";	
 	printf("\n4. Invalid message (not well-formed with open/close tag imbalance):\n %s\n\n", invalidMsg3);
 	process(invalidMsg3);
 	printf("\n\n");
@@ -65,7 +66,7 @@ int main()
 	printf("\n\n");
 
 	// 5. Invalid message: Has missing elements. In the following test-vector, 'ROOT_BROKER_ID' is missing. Has correct digest.
-	char invalidMsg4[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>821b1e7098beeffbb1c49b6f55f72ae592bbbb5a</SHA1></CRL_MESSAGE>";
+	char invalidMsg4[] = "<CRL_MESSAGE Length =\"0000660\"><CONTROL_MESSAGE_LENGTH>0000660</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>5abc754869306894bcf34a3c519df2eebc8d21f9</SHA1></CRL_MESSAGE>";
 	printf("\n5. Invalid message (missing elements - ROOT_BROKER_ID missing):\n %s\n\n", invalidMsg4);
 	process(invalidMsg4);
 	printf("\n\n");
@@ -74,7 +75,7 @@ int main()
 	printf("\n\n");
 
 	// 6. Invalid message: Contents of some elements (except UBL and FQ) are empty. In the following example, CHILD_BROKER_ID's contents are missing. Has correct digest.
-	char invalidMsg5[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID></CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>1411a22dc5229cbcb70843cc39cc73e07ab2e1d3</SHA1></CRL_MESSAGE>";
+	char invalidMsg5[] = "<CRL_MESSAGE Length =\"0000693\"><CONTROL_MESSAGE_LENGTH>0000693</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID></CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>ecb8f43d78806629dedc8c045d0cf2688fca0219</SHA1></CRL_MESSAGE>";
 	printf("\n6. Invalid message (empty elements - CHILD_BROKER_ID empty):\n %s\n\n", invalidMsg5);
 	process(invalidMsg5);
 	printf("\n\n"); printf("Upstream Brokers List: \n%s", get_UBL());
@@ -82,7 +83,7 @@ int main()
 	printf("\n\n");
 
 	// 7. Valid message.
-	char validMsg2[] = "<CRL_MESSAGE Length =\"0005130\"><CONTROL_MESSAGE_LENGTH>0005130</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>a1af33851bf6b1a96ac66b78569b78844349a1ab</SHA1></CRL_MESSAGE>";
+	char validMsg2[] = "<CRL_MESSAGE Length =\"0000718\"><CONTROL_MESSAGE_LENGTH>0000718</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>86971d62f20746200de3797f896e7620945ca40f</SHA1></CRL_MESSAGE>";
 	printf("\n7. Valid message:\n %s\n\n", validMsg2);
 	process(validMsg2);
 	printf("\n\n");
@@ -100,7 +101,7 @@ int main()
 	printf("\n\n");
 
 	// 9. Invalid message: Improper convention - element names not capitalized (Control_Message_Length).
-	char invalidMsg7[] = "<CRL_MESSAGE Length =\"0000500\"><Control_Message_Length>0000500</Control_Message_Length><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a91122d1cd57f0011d6987905cc0e6975d2e5ffa</SHA1></CRL_MESSAGE>";
+	char invalidMsg7[] = "<CRL_MESSAGE Length =\"0000712\"><Control_Message_Length>0000712</Control_Message_Length><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>438efdfac9c1a25ed143ffa9ae31bdff2917231b</SHA1></CRL_MESSAGE>";
 	printf("\n9. Invalid message (improper convention - element names not capitalized):\n %s\n\n", invalidMsg7);
 	process(invalidMsg7);
 	printf("\n\n");
@@ -109,7 +110,7 @@ int main()
 	printf("\n\n");
 
 	// 10. Invalid message: Improper convention - attribute names not in upper camel case.
-	char invalidMsg8[] = "<CRL_MESSAGE length =\"0000500\"><Control_Message_Length>0000500</Control_Message_Length><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>94da2d2f4699057d8125268a97bc25ec6dc195f0</SHA1></CRL_MESSAGE>";
+	char invalidMsg8[] = "<CRL_MESSAGE length =\"0000712\"><Control_Message_Length>0000712</Control_Message_Length><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>0e2efba96a612f5d1a1c8c12a779e8f69315e499</SHA1></CRL_MESSAGE>";
 	printf("\n10. Invalid message (improper convention - attribute names not in upper camel case):\n %s\n\n", invalidMsg8);
 	process(invalidMsg8);
 	printf("\n\n");
@@ -117,8 +118,8 @@ int main()
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 	
-	// 11. Valid message: more brokers - 10.
-	char validMsg3[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4><BROKER5 IP = \"119.32.45.260\" Port = \"8438\" NameID = \"rho\" Priority = \"02\"></BROKER5><BROKER6 IP = \"149.84.46.280\" Port = \"88\" NameID = \"phi\" Priority = \"07\"></BROKER6><BROKER7 IP = \"149.44.45.280\" Port = \"8658\" NameID = \"eta\" Priority = \"10\"></BROKER7><BROKER8 IP = \"159.84.66.280\" Port = \"8800\" NameID = \"nabla\" Priority = \"07\"></BROKER8><BROKER9 IP = \"149.64.46.280\" Port = \"88\" NameID = \"omega\" Priority = \"13\"></BROKER9><BROKER10 IP = \"149.84.46.241\" Port = \"88\" NameID = \"mu\" Priority = \"07\"></BROKER10></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>46c5e95e1ab400976fa31b3831024db68b4dde81</SHA1></CRL_MESSAGE>";
+	// 11. Valid message with 10 brokers.
+	char validMsg3[] = "<CRL_MESSAGE Length =\"0001221\"><CONTROL_MESSAGE_LENGTH>0001221</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4><BROKER5 IP = \"119.32.45.260\" Port = \"8438\" NameID = \"rho\" Priority = \"02\"></BROKER5><BROKER6 IP = \"149.84.46.280\" Port = \"88\" NameID = \"phi\" Priority = \"07\"></BROKER6><BROKER7 IP = \"149.44.45.280\" Port = \"8658\" NameID = \"eta\" Priority = \"10\"></BROKER7><BROKER8 IP = \"159.84.66.280\" Port = \"8800\" NameID = \"nabla\" Priority = \"07\"></BROKER8><BROKER9 IP = \"149.64.46.280\" Port = \"88\" NameID = \"omega\" Priority = \"13\"></BROKER9><BROKER10 IP = \"149.84.46.241\" Port = \"88\" NameID = \"mu\" Priority = \"07\"></BROKER10></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>dc843823b4d0d2b02337e35276c72e2d505e17f4</SHA1></CRL_MESSAGE>";
 	printf("\n11. Valid message: more brokers - 10.\n %s\n\n", validMsg3);
 	process(validMsg3);
 	printf("\n\n");
@@ -126,8 +127,8 @@ int main()
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 
-	// 12. Valid message: 2 brokers.
-	char validMsg4[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>9b855f85c4567cc18bbc005ab6a8057db02c7758</SHA1></CRL_MESSAGE>";
+	// 12. Valid message with 2 brokers.
+	char validMsg4[] = "<CRL_MESSAGE Length =\"0000540\"><CONTROL_MESSAGE_LENGTH>0000540</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>d558df2fcd1cf4361dd4f32297612559a7759ee9</SHA1></CRL_MESSAGE>";
 	printf("\n12. Valid message: 2 brokers.\n %s\n\n", validMsg4);
 	process(validMsg4);
 	printf("\n\n");
@@ -135,12 +136,33 @@ int main()
 	printf("Filtering Query: %s", get_FQ());
 	printf("\n\n");
 
+	// 13. Invalid message: Incorrect length in CONTROL_MESSAGE_LENGTH element.
+	char invalidMsg9[] = "<CRL_MESSAGE Length =\"0000172\"><CONTROL_MESSAGE_LENGTH>0000172</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>b46222e289b446e87d8632eadf17dd512f67f37c</SHA1></CRL_MESSAGE>";
+	printf("\n13. Invalid message (Incorrect length in CONTROL_MESSAGE_LENGTH element):\n %s\n\n", invalidMsg9);
+	process(invalidMsg9);
+	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
+	// 14. Invalid message: Incorrect length in Length attribute of CRL_MESSAGE element.
+	char invalidMsg10[] = "<CRL_MESSAGE Length =\"0000702\"><CONTROL_MESSAGE_LENGTH>0000712</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>eb473c1274176406edcca3b6b7138a19d0132da9</SHA1></CRL_MESSAGE>";
+	printf("\n14. Invalid message (Incorrect length in Length attribute of CRL_MESSAGE element):\n %s\n\n", invalidMsg10);
+	process(invalidMsg10);
+	printf("\n\n");
+	printf("Upstream Brokers List: \n%s", get_UBL());
+	printf("Filtering Query: %s", get_FQ());
+	printf("\n\n");
+
 	freeMem();
-	// Unit tests for SHA-1 validation.
+
+	/*
+	 * Unit tests for SHA-1 validation.
+	*/
 
 	// 1. Authentic message. 
-	char authMsg1[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>eba5584b054894c38a75a18f7578013489586dd5</SHA1></CRL_MESSAGE>";
-	char shamsg[] = "eba5584b054894c38a75a18f7578013489586dd5";
+	char authMsg1[] = "<CRL_MESSAGE Length =\"0000712\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>24861d5efc325064ef27e0c9c86cbb174b5da2ca</SHA1></CRL_MESSAGE>";
+	char shamsg[] = "24861d5efc325064ef27e0c9c86cbb174b5da2ca";
 	if (strcmp(shafunc(authMsg1), shamsg) == 0)
 	{
 		printf("The message \n\n %s \n\n is valid.\n\n\n", authMsg1);
@@ -151,7 +173,7 @@ int main()
 	}
 
 	// 2. Forged message.
-	char forgedMsg1[] = "<CRL_MESSAGE Length =\"0000500\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
+	char forgedMsg1[] = "<CRL_MESSAGE Length =\"0000712\"><CONTROL_MESSAGE_LENGTH>0000500</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>CM0002</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.168.100.1:50000</ROOT_BROKER_ID><CHILD_BROKER_ID>192.168.102.1:55550</CHILD_BROKER_ID><UBL><BROKER1 IP = \"129.82.47.138\" Port = \"80\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND40</FILTERING_QUERY><SHA1>a14f51c827d71674d746a30dd68ae32fba8f5c36</SHA1></CRL_MESSAGE>";
 	char shamsg2[] = "a14f51c827d71674d746a30dd68ae32fba8f5c36";
 	if (strcmp(shafunc(forgedMsg1), shamsg2) == 0)
 	{
@@ -163,8 +185,8 @@ int main()
 	}
 
 	// 3. Authentic message.
-	char authMsg2[] = "<CRL_MESSAGE Length =\"0005130\"><CONTROL_MESSAGE_LENGTH>0005130</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>a1af33851bf6b1a96ac66b78569b78844349a1ab</SHA1></CRL_MESSAGE>";
-	char shamsg3[] = "a1af33851bf6b1a96ac66b78569b78844349a1ab";
+	char authMsg2[] = "<CRL_MESSAGE Length =\"0000712\"><CONTROL_MESSAGE_LENGTH>0005130</CONTROL_MESSAGE_LENGTH><CONTROL_MESSAGE_ID>ID0032</CONTROL_MESSAGE_ID><ROOT_BROKER_ID>192.148.540.110:67400</ROOT_BROKER_ID><CHILD_BROKER_ID>122.148.122.132:57850</CHILD_BROKER_ID><UBL><BROKER1 IP = \"119.82.47.138\" Port = \"8040\" NameID = \"alpha\" Priority = \"60\"></BROKER1><BROKER2 IP = \"129.82.47.234\" Port = \"8080\" NameID = \"beta\" Priority = \"10\"></BROKER2><BROKER3 IP = \"129.82.47.242\" Port = \"5050\" NameID = \"gamma\" Priority = \"5\"></BROKER3><BROKER4 IP = \"129.82.47.230\" Port = \"8888\" NameID = \"delta\" Priority = \"0\"></BROKER4></UBL><FILTERING_QUERY>Industry = IND35</FILTERING_QUERY><SHA1>4636b2c09d5d9cd10fbe25923def03c88e840e66</SHA1></CRL_MESSAGE>";
+	char shamsg3[] = "4636b2c09d5d9cd10fbe25923def03c88e840e66";
 	if (strcmp(shafunc(authMsg2), shamsg3) == 0)
 	{
 		printf("The message \n\n %s \n\n is valid.\n\n\n", authMsg2);
@@ -173,6 +195,7 @@ int main()
 	{
 		printf("The message \n\n %s \n\n is invalid.\n\n\n", authMsg2);
 	}
+	
 	getchar();
 	return 0;
 }
