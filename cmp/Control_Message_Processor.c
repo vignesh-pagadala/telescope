@@ -532,17 +532,31 @@ int_fast8_t filter(char *buff)
 
 void printUBL()
 {
-	printf("\n");
-	for (int i = 0; Control_Message_Processor_UBL[i] != '\0'; i++)
+	if (Control_Message_Processor_UBL == NULL)
 	{
-		if (Control_Message_Processor_UBL[i] == '\n')
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Memory not allocated. Incorrect usage of printUBL.\n");
+		delay(1);
+		exit(0);
+	}
+	if (Control_Message_Processor_ISVALID == 1)
+	{
+		printf("\n");
+		for (int i = 0; Control_Message_Processor_UBL[i] != '\0'; i++)
 		{
-			printf("\n");
+			if (Control_Message_Processor_UBL[i] == '\n')
+			{
+				printf("\n");
+			}
+			else
+			{
+				printf("%c", Control_Message_Processor_UBL[i]);
+			}
 		}
-		else
-		{
-			printf("%c", Control_Message_Processor_UBL[i]);
-		}
+	}
+	else
+	{
+		fprintf(stderr, "%s", "\nControlMessageProcessorError: Invalid message.\n");
+		return NULL;
 	}
 }
 
