@@ -142,6 +142,16 @@ void start(void *data, const char *element, const char **Attribute)
 			{
 				Control_Message_Processor_ATTRIBUTE_CASE = 1;
 			}
+			if (strcmp(element, "CRL_MESSAGE") == 0)
+			{
+				if (strcmp(Attribute[0], "Length") == 0)
+				{
+					if (strcmp(atoi(Attribute[1]), Control_Message_Processor_MESSAGE_LENGTH) != 0)
+					{
+						Control_Message_Processor_LENGTH_VALID = 1;
+					}
+				}
+			}
 			uint_fast16_t i;
 			for (i = 0; Attribute[i]; i += 2)
 			{
