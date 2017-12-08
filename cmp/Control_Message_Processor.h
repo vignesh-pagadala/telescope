@@ -28,7 +28,7 @@
 /*
 * @desc Calls filter(). For performing further processing.
 * @param The XML control message to be processed.
-* @return 0.
+* @return -1 if the message is invalid. 0 if valid..
 */
 int process(char *buff);
 
