@@ -45,6 +45,8 @@ uint_fast8_t Control_Message_Processor_CONTENT_FLAG = 0;
 uint_fast8_t Control_Message_Processor_ELEMENT_CASE = 0;
 uint_fast8_t Control_Message_Processor_ATTRIBUTE_CASE = 0;
 
+unsigned long int Control_Message_Processor_MESSAGE_LENGTH = 0;
+uint_fast8_t Control_Message_Processor_LENGTH_VALID = 0;
 
 void delay(unsigned int seconds)
 {
@@ -171,13 +173,22 @@ void start(void *data, const char *element, const char **Attribute)
 // Expat handler for detecting element end tags.
 void end(void* data, const char* element)
 {
-	//printf("\nElement: %s Content: %s\n", element, Control_Message_Processor_CONT);
 	Control_Message_Processor_DEPTH--;
-	if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0 && Control_Message_Processor_Flag == 4)
+
+	// For Control_Message_Processor_Length
+	if (Control_Message_Processor_Flag == 4)
 	{
-		Control_Message_Processor_Flag = 0;
+		if (strcmp(element, "CONTROL_MESSAGE_LENGTH") == 0)
+		{
+			Control_Message_Processor_Flag = 0;
+		}
+		
+		if (Control_Message_Processor_MESSAGE_LENGTH != atoi(Control_Message_Processor_CONT))
+		{
+			Control_Message_Processor_LENGTH_VALID = 1;
+		}
 	}
-	
+
 	// For UBL
 	if (Control_Message_Processor_Flag == 1)
 	{
@@ -432,6 +443,8 @@ int_fast8_t filter(char *buff)
 
 	Control_Message_Processor_UBL = NULL;
 	Control_Message_Processor_UBL = (char*)malloc(sizeof(char*) * CMP_MAX_UBL);
+	Control_Message_Processor_MESSAGE_LENGTH = strlen(buff);
+
 	if (Control_Message_Processor_UBL == NULL)
 	{
 		perror("\nError: Could not allocate memory for Upstream Brokers List buffer. \n Terminating program...");
@@ -439,6 +452,7 @@ int_fast8_t filter(char *buff)
 		exit(0);
 	}
 	*Control_Message_Processor_UBL = '\0';
+	//printf("\nCMP length: %lu\n", Control_Message_Processor_MESSAGE_LENGTH);
 
 	// Initiate parse.
 	XML_Parser p = XML_ParserCreate(NULL);
@@ -482,6 +496,12 @@ int_fast8_t filter(char *buff)
 		return -1;
 	}
 
+	// Message length check.
+	if (Control_Message_Processor_LENGTH_VALID == 1)
+	{
+		return -1;
+	}
+
 	// Check SHA-1 digest.
 	char* digest = shafunc(buff);
 	if (strcmp(Control_Message_Processor_SHA1, digest) == 0)
@@ -497,6 +517,22 @@ int_fast8_t filter(char *buff)
 	else
 	{
 		return -1;
+	}
+}
+
+void printUBL()
+{
+	printf("\n");
+	for (int i = 0; Control_Message_Processor_UBL[i] != '\0'; i++)
+	{
+		if (Control_Message_Processor_UBL[i] == '\n')
+		{
+			printf("\n");
+		}
+		else
+		{
+			printf("%c", Control_Message_Processor_UBL[i]);
+		}
 	}
 }
 
@@ -538,5 +574,3 @@ int process(char *buff)
 	}
 	return 0;
 }
-
-
