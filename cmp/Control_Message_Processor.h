@@ -67,6 +67,12 @@ char* shafunc(char *buff);
 void freeMem(void);
 
 /*
+* @desc Reads UBL of most recently process()ed control message and prints it out.
+* @usage After a call to process(); before a call to freeMem().
+*/
+void printUBL();
+
+/*
 * @desc Introduces a time-delay.
 * @param Number of seconds to delay.
 */
