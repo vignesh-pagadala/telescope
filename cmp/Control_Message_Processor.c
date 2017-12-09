@@ -136,12 +136,6 @@ void start(void *data, const char *element, const char **Attribute)
 
 		if (Attribute[0] != NULL)
 		{
-			if (Attribute[0][0] >= 'A' && Attribute[0][0] <= 'Z')
-				;
-			else
-			{
-				Control_Message_Processor_ATTRIBUTE_CASE = 1;
-			}
 			if (strcmp(element, "CRL_MESSAGE") == 0)
 			{
 				if (strcmp(Attribute[0], "Length") == 0)
@@ -449,7 +443,6 @@ int_fast8_t filter(char *buff)
 	Control_Message_Processor_CONTENT_FLAG = 0;
 	Control_Message_Processor_Flag = 0;
 	Control_Message_Processor_DEPTH = 0;
-	Control_Message_Processor_ATTRIBUTE_CASE = 0;
 
 	Control_Message_Processor_UBL = NULL;
 	Control_Message_Processor_UBL = (char*)malloc(sizeof(char*) * CMP_MAX_UBL);
@@ -500,12 +493,6 @@ int_fast8_t filter(char *buff)
 		return -1;
 	}
 	
-	// Attribute case check.
-	if (Control_Message_Processor_ATTRIBUTE_CASE == 1)
-	{
-		return -1;
-	}
-
 	// Message length check.
 	if (Control_Message_Processor_LENGTH_VALID == 1)
 	{
