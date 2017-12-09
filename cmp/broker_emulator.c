@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2012-2014  Kirill Belyaev
+* Copyright (c) 2014-2018  Kirill Belyaev
 * kirillbelyaev@yahoo.com
 * kirill@cs.colostate.edu
 * TeleScope - XML Message Stream Broker/Replicator Platform
